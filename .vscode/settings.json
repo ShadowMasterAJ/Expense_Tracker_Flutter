@@ -1,0 +1,11 @@
+{
+    "html.format.wrapLineLength": 200,
+    "editor.wordWrapColumn": 200,
+    "editor.wordWrap": "wordWrapColumn",
+    "editor.wrappingIndent": "deepIndent",
+    "workbench.editor.wrapTabs": true,
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "diffEditor.codeLens": true
+}
