@@ -103,11 +103,49 @@ class _MyHomePageState extends State<MyHomePage> {
         });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final isLandscape =
-        MediaQuery.of(context).orientation == Orientation.landscape;
-    final PreferredSizeWidget appBar = Platform.isIOS
+  List<Widget> _buildLandscapeContent(
+      // MediaQueryData mediaQuery,
+      // AppBar appBar,
+      Widget txListWidget,
+      txChartWidget) {
+    return [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Show Chart',
+            style: Theme.of(context).textTheme.headline6,
+            // TextStyle(
+            //   color: Color(0xFFFFB700F),
+            //   fontSize: 20,
+            //   fontFamily: 'Nexa',
+            //   fontWeight: FontWeight.bold,
+            // ),
+          ),
+          Switch.adaptive(
+              activeColor: Theme.of(context).accentColor,
+              value: _showChart,
+              onChanged: (val) {
+                setState(() {
+                  _showChart = val;
+                });
+              }),
+        ],
+      ),
+      _showChart ? txChartWidget : txListWidget
+    ];
+  }
+
+  List<Widget> _buildPortraitContent(
+      // MediaQueryData mediaQuery,
+      // AppBar appBar,
+      Widget txListWidget,
+      txChartWidget) {
+    return [txChartWidget, txListWidget];
+  }
+
+  Widget _buildAppBar() {
+    return Platform.isIOS
         ? CupertinoNavigationBar(
             middle: Text(
               'Expense Tracker',
@@ -145,33 +183,41 @@ class _MyHomePageState extends State<MyHomePage> {
                   : Container(),
             ],
           );
+  }
 
+  @override
+  Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+
+    final isLandscape = mediaQuery.orientation == Orientation.landscape;
+    final PreferredSizeWidget appBar = _buildAppBar();
     final txListWidget = Container(
         // margin: EdgeInsets.only(top: 10),
         height: !isLandscape
-            ? (MediaQuery.of(context).size.height -
+            ? (mediaQuery.size.height -
                     appBar.preferredSize.height -
                     10 -
                     40 -
-                    MediaQuery.of(context).padding.top) *
+                    mediaQuery.padding.top) *
                 .75
-            : (MediaQuery.of(context).size.height -
+            : (mediaQuery.size.height -
                 appBar.preferredSize.height -
                 10 -
                 40 -
-                MediaQuery.of(context).padding.top),
+                mediaQuery.padding.top),
         child: TransactionList(_userTransactions, _deleteTransaction));
+
     final txChartWidget = Container(
         height: !isLandscape
-            ? (MediaQuery.of(context).size.height -
+            ? (mediaQuery.size.height -
                     appBar.preferredSize.height -
                     10 -
-                    MediaQuery.of(context).padding.top) *
+                    mediaQuery.padding.top) *
                 .25
-            : (MediaQuery.of(context).size.height -
+            : (mediaQuery.size.height -
                     appBar.preferredSize.height -
                     10 -
-                    MediaQuery.of(context).padding.top) *
+                    mediaQuery.padding.top) *
                 .65,
         child: Chart(_recentTransitions));
     final pageScaffold = SafeArea(
@@ -180,33 +226,10 @@ class _MyHomePageState extends State<MyHomePage> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          if (!isLandscape)
+            ..._buildPortraitContent(txListWidget, txChartWidget),
           if (isLandscape)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Show Chart',
-                  style: Theme.of(context).textTheme.headline6,
-                  // TextStyle(
-                  //   color: Color(0xFFFFB700F),
-                  //   fontSize: 20,
-                  //   fontFamily: 'Nexa',
-                  //   fontWeight: FontWeight.bold,
-                  // ),
-                ),
-                Switch.adaptive(
-                    activeColor: Theme.of(context).accentColor,
-                    value: _showChart,
-                    onChanged: (val) {
-                      setState(() {
-                        _showChart = val;
-                      });
-                    }),
-              ],
-            ),
-          if (!isLandscape) txChartWidget,
-          if (!isLandscape) txListWidget,
-          if (isLandscape) _showChart ? txChartWidget : txListWidget
+            ..._buildLandscapeContent(txListWidget, txChartWidget)
         ],
       ),
     ));
